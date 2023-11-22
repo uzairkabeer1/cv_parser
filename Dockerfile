@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.11
+FROM python:3.10.9
 
 WORKDIR /
 
@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 3100
 
-CMD ["gunicorn", "main:app"]
+CMD ["gunicorn", "api:app"]
