@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
-from parser import ResumeParser
+from pyresparser import ResumeParser
 from threading import Thread
 import shutil
 import os
