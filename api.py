@@ -1,10 +1,10 @@
-from fastapi import FastAPI, UploadFile, File
+from flask import Flask, request
+from werkzeug.utils import secure_filename
 from pyresparser import ResumeParser
-from threading import Thread
 import shutil
 import os
-app = FastAPI()
 
+app = Flask(__name__)
 
 def format_resume_data(resume_data):
     formatted_data = {
@@ -29,35 +29,31 @@ def format_resume_data(resume_data):
         }
     }
     return formatted_data
-
+   
 
 def parse_and_format_resume(file_path):
     resume_data = ResumeParser(file_path).get_extracted_data()
-    return resume_data
+    formatted_data = format_resume_data(resume_data)
+    return formatted_data
 
-
-@app.post("/testing/")
-async def testing():
+@app.route('/testing/', methods=['GET'])
+def testing():
     return {"message": "Hello World"}
 
-
-@app.post("/uploadresume/")
-async def upload_resume(file: UploadFile = File(...)):
+@app.route('/uploadresume/', methods=['POST'])
+def upload_resume():
     try:
+        if 'file' not in request.files:
+            return {"error": "No file part"}
+        file = request.files['file']
+        if file.filename == '':
+            return {"error": "No selected file"}
         
-        temp_file_path = f"temp_{file.filename}"
-        with open(temp_file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        temp_file_path = f"temp_{secure_filename(file.filename)}"
+        file.save(temp_file_path)
 
-        
-        thread = Thread(target=parse_and_format_resume, args=(temp_file_path,))
-        thread.start()
-        thread.join()  
-
-        
         formatted_resume_data = parse_and_format_resume(temp_file_path)
 
-        
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
 
@@ -65,3 +61,5 @@ async def upload_resume(file: UploadFile = File(...)):
     except Exception as e:
         return {"error": str(e)}
 
+if __name__ == '__main__':
+    app.run(debug=True)
