@@ -36,6 +36,11 @@ def parse_and_format_resume(file_path):
     return resume_data
 
 
+@app.post("/testing/")
+async def testing():
+    return {"message": "Hello World"}
+
+
 @app.post("/uploadresume/")
 async def upload_resume(file: UploadFile = File(...)):
     try:
