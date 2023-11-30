@@ -3,9 +3,6 @@ from pyresparser import ResumeParser
 from threading import Thread
 import shutil
 import os
-import nltk
-nltk.download('stopwords')
-
 app = FastAPI()
 
 
