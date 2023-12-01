@@ -36,7 +36,7 @@ def parse_and_format_resume(file_path):
     return resume_data
 
 
-@app.post("/cv-parser2/testing/")
+@app.get("/cv-parser2/testing/")
 async def testing():
     return {"message": "Hello World"}
 
