@@ -1,10 +1,23 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, File, UploadFile
+from boto3 import session as boto3_session
+from botocore.client import Config
 from pyresparser import ResumeParser
-from threading import Thread
-import shutil
 import os
+import shutil
 
 app = FastAPI()
+
+# AWS (DigitalOcean Spaces) Credentials and Configuration
+ACCESS_ID = 'DO00NTV6Z7P4HNXANDWF'  # Your Access Key
+SECRET_KEY = '0FHGT+GOLfu6Fg9k/X52DE3MU70/bG83O7N9DWxu1VM' # Your Secret Key
+
+# Initiate session with DigitalOcean Spaces
+session = boto3_session.Session()
+client = session.client('s3',
+                        region_name='nyc3',  # or your region name
+                        endpoint_url='https://nyc3.digitaloceanspaces.com',  # or your endpoint URL
+                        aws_access_key_id=ACCESS_ID,
+                        aws_secret_access_key=SECRET_KEY)
 
 # this is for fomatting data
 def format_resume_data(resume_data):
@@ -45,23 +58,20 @@ async def testing():
 @app.post("/uploadresume/")
 async def upload_resume(file: UploadFile = File(...)):
     try:
-        
-        temp_file_path = f"{file.filename}"
+        # Temporary file path (e.g., in-memory buffer)
+        temp_file_path = file.filename.split('/')[-1].split('\\')[-1]
+
+        # Save file to a temporary buffer
         with open(temp_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        
-        thread = Thread(target=parse_and_format_resume, args=(temp_file_path,))
-        thread.start()
-        thread.join()  
+        # Upload file to DigitalOcean Space
+        client.upload_file(temp_file_path, 'cv', f'cv/{temp_file_path}')
 
-        
-        formatted_resume_data = parse_and_format_resume(temp_file_path)
-
-        
+        # Remove the temporary file if it exists
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
 
-        return formatted_resume_data
+        return {"message": "File uploaded successfully to DigitalOcean Spaces"}
     except Exception as e:
         return {"error": str(e)}
