@@ -15,7 +15,7 @@ SECRET_KEY = '0FHGT+GOLfu6Fg9k/X52DE3MU70/bG83O7N9DWxu1VM' # Your Secret Key
 session = boto3_session.Session()
 client = session.client('s3',
                         region_name='nyc3',  # or your region name
-                        endpoint_url='https://nyc3.digitaloceanspaces.com',  # or your endpoint URL
+                        endpoint_url='https://cvdata.nyc3.digitaloceanspaces.com',  # or your endpoint URL
                         aws_access_key_id=ACCESS_ID,
                         aws_secret_access_key=SECRET_KEY)
 
@@ -58,20 +58,24 @@ async def testing():
 @app.post("/uploadresume/")
 async def upload_resume(file: UploadFile = File(...)):
     try:
-        # Temporary file path (e.g., in-memory buffer)
-        temp_file_path = file.filename.split('/')[-1].split('\\')[-1]
+        # Sanitize or generate a new filename
+        temp_file_path = "sanitized_filename_here"  # Replace with a sanitized filename
 
         # Save file to a temporary buffer
         with open(temp_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
         # Upload file to DigitalOcean Space
-        client.upload_file(temp_file_path, 'cv', f'{temp_file_path}')
+        client.upload_file(temp_file_path, 'cvdata', f'cv/{temp_file_path}')
+
+        # Parse and format resume data
+        resume_data = parse_and_format_resume(temp_file_path)
+        formatted_data = format_resume_data(resume_data)
 
         # Remove the temporary file if it exists
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
 
-        return {"message": "File uploaded successfully to DigitalOcean Spaces"}
+        return formatted_data
     except Exception as e:
         return {"error": str(e)}
