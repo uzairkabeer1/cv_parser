@@ -6,7 +6,7 @@ import os
 
 app = FastAPI()
 
-
+# this is for fomatting data
 def format_resume_data(resume_data):
     formatted_data = {
         'Personal Information': {
