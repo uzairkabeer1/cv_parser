@@ -66,7 +66,7 @@ async def upload_resume(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
 
         # Upload file to DigitalOcean Space
-        client.upload_file(temp_file_path, 'cv', f'cv/{temp_file_path}')
+        client.upload_file(temp_file_path, 'cv', f'{temp_file_path}')
 
         # Remove the temporary file if it exists
         if os.path.exists(temp_file_path):
