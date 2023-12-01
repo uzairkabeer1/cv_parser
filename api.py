@@ -46,7 +46,7 @@ async def testing():
 async def upload_resume(file: UploadFile = File(...)):
     try:
         
-        temp_file_path = f"temp_{file.filename}"
+        temp_file_path = f"{file.filename}"
         with open(temp_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
