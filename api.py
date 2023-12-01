@@ -3,9 +3,6 @@ from pyresparser import ResumeParser
 from threading import Thread
 import shutil
 import os
-import nltk
-nltk.download('stopwords')
-
 app = FastAPI()
 
 
@@ -39,6 +36,11 @@ def parse_and_format_resume(file_path):
     return resume_data
 
 
+@app.post("/testing/")
+async def testing():
+    return {"message": "Hello World"}
+
+
 @app.post("/uploadresume/")
 async def upload_resume(file: UploadFile = File(...)):
     try:
@@ -62,4 +64,3 @@ async def upload_resume(file: UploadFile = File(...)):
         return formatted_resume_data
     except Exception as e:
         return {"error": str(e)}
-
