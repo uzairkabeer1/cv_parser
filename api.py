@@ -36,12 +36,12 @@ def parse_and_format_resume(file_path):
     return resume_data
 
 
-@app.post("/testing/")
+@app.post("/cv-parser2/testing/")
 async def testing():
     return {"message": "Hello World"}
 
 
-@app.post("/uploadresume/")
+@app.post("/cv-parser2/uploadresume/")
 async def upload_resume(file: UploadFile = File(...)):
     try:
         
