@@ -3,6 +3,7 @@ from pyresparser import ResumeParser
 from threading import Thread
 import shutil
 import os
+
 app = FastAPI()
 
 
@@ -36,12 +37,12 @@ def parse_and_format_resume(file_path):
     return resume_data
 
 
-@app.get("/cv-parser2/testing/")
+@app.get("/testing/")
 async def testing():
     return {"message": "Hello World"}
 
 
-@app.post("/cv-parser2/uploadresume/")
+@app.post("/uploadresume/")
 async def upload_resume(file: UploadFile = File(...)):
     try:
         
